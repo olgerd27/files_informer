@@ -13,9 +13,9 @@ class FilterDirsProxyModel : public QSortFilterProxyModel
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
     {
-        QFileSystemModel *m = dynamic_cast<QFileSystemModel*>(sourceModel());
-        QModelIndex index = m->index(source_row, 0, source_parent);
-        return m->isDir(index) ? true : false;
+        QFileSystemModel *model = dynamic_cast<QFileSystemModel*>(sourceModel());
+        QModelIndex index = model->index(source_row, 0, source_parent);
+        return model->isDir(index) ? true : false;
     }
 };
 
@@ -24,10 +24,10 @@ class SortFilesDirsProxyModel : public QSortFilterProxyModel
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const
     {
-        QFileSystemModel *m = dynamic_cast<QFileSystemModel*>(sourceModel());
-        if(!m->isDir(left) && m->isDir(right))
+        QFileSystemModel *model = dynamic_cast<QFileSystemModel*>(sourceModel());
+        if(!model->isDir(left) && model->isDir(right))
             return false;
-        else if(m->isDir(left) && !m->isDir(right))
+        else if(model->isDir(left) && !model->isDir(right))
             return true;
         else
             return left.data().toString().toLower() < right.data().toString().toLower(); // for files and dirs
@@ -102,22 +102,18 @@ MainWindow::~MainWindow()
 /*
  * MainWindow slots
  */
-void MainWindow::slotSetListRootIndex(const QModelIndex &treeIndex)
+void MainWindow::slotSetListRootIndex(const QModelIndex &indexTree)
 {
-    qDebug() << "set list root index";
-    qDebug() << "row =" << treeIndex.row() << ", col =" << treeIndex.column()
-             << ", id =" << treeIndex.internalId() << ", data:" << treeIndex.data();
-//    QModelIndex index(treeIndex.row(), treeIndex.column());
-//    qDebug() << "is dir =" << m_FSmodel->isDir(index);
-//    ui->m_dirsContentsList->setRootIndex(QModelIndex());
+    QModelIndex indexSource = m_dirsModel->mapToSource(indexTree);
+    QModelIndex indexProxyModel = m_dirsContentsModel->mapFromSource(indexSource);
+    ui->m_dirsContentsList->setRootIndex(indexProxyModel);
 }
 
-void MainWindow::slotSetTreeCurrentIndex(const QModelIndex &listIndex)
+void MainWindow::slotSetTreeCurrentIndex(const QModelIndex &indexList)
 {
-    qDebug() << "set tree current index";
-    qDebug() << "row =" << listIndex.row() << ", col =" << listIndex.column()
-             << ", id =" << listIndex.internalId() << ", data:" << listIndex.data();
-//    ui->m_dirsTree->setCurrentIndex(QModelIndex());
+    QModelIndex indexSource = m_dirsContentsModel->mapToSource(indexList);
+    QModelIndex indexProxyModel = m_dirsModel->mapFromSource(indexSource);
+    ui->m_dirsTree->setCurrentIndex(indexProxyModel);
 }
 
 void MainWindow::slotGetFileInfo()

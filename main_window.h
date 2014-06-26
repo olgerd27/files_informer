@@ -32,8 +32,8 @@ private:
     SortFilesDirsProxyModel *m_dirsContentsModel;
 
 private slots:
-    void slotSetListRootIndex(const QModelIndex &treeIndex);
-    void slotSetTreeCurrentIndex(const QModelIndex &listIndex);
+    void slotSetListRootIndex(const QModelIndex &indexTree);
+    void slotSetTreeCurrentIndex(const QModelIndex &indexList);
     void slotGetFileInfo();
 };
 
