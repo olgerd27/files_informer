@@ -48,7 +48,6 @@ void MainWindow::setModels()
 {
     m_FSmodel = new QFileSystemModel;
     m_FSmodel->setRootPath(QDir::currentPath());
-//    m_FSmodel->setFilter(QDir::Drives | QDir::AllDirs | QDir::NoDotAndDotDot);
 
     m_dirsModel = new FilterDirsProxyModel;
     m_dirsModel->setSourceModel(m_FSmodel);
@@ -57,7 +56,6 @@ void MainWindow::setModels()
 
     m_dirsContentsModel = new SortFilesDirsProxyModel;
     m_dirsContentsModel->setSourceModel(m_FSmodel);
-//    m_dirsContentsModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_dirsContentsModel->sort(0, Qt::AscendingOrder);
 }
 
@@ -83,6 +81,8 @@ void MainWindow::setDirsViews()
             this, SLOT(slotSetListRootIndex(QModelIndex)));
     connect(ui->m_dirsContentsList, SIGNAL(activated(QModelIndex)),
             this, SLOT(slotSetTreeCurrentIndex(QModelIndex)));
+    connect(ui->m_dirsContentsList, SIGNAL(activated(QModelIndex)),
+            this, SLOT(slotActivatedOnlyDirs(QModelIndex)));
 }
 
 void MainWindow::setButtons()
@@ -114,6 +114,20 @@ void MainWindow::slotSetTreeCurrentIndex(const QModelIndex &indexList)
     QModelIndex indexSource = m_dirsContentsModel->mapToSource(indexList);
     QModelIndex indexProxyModel = m_dirsModel->mapFromSource(indexSource);
     ui->m_dirsTree->setCurrentIndex(indexProxyModel);
+}
+
+/*
+ * This slot uses for setting root index in a current view only if a dir was activated.
+ * If there are trying to activate a file, nothing will be done.
+ */
+void MainWindow::slotActivatedOnlyDirs(const QModelIndex &index)
+{
+    const QSortFilterProxyModel *model = dynamic_cast<const QSortFilterProxyModel*>(index.model());
+    QModelIndex indexSource = model->mapToSource(index);
+    if( QFileSystemModel *sourceModel = dynamic_cast<QFileSystemModel *>(model->sourceModel()) )
+        if(sourceModel->isDir(indexSource))
+            if( QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(sender()) )
+                view->setRootIndex(index);
 }
 
 void MainWindow::slotGetFileInfo()

@@ -34,6 +34,7 @@ private:
 private slots:
     void slotSetListRootIndex(const QModelIndex &indexTree);
     void slotSetTreeCurrentIndex(const QModelIndex &indexList);
+    void slotActivatedOnlyDirs(const QModelIndex &index);
     void slotGetFileInfo();
 };
 
