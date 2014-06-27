@@ -92,15 +92,35 @@
          </item>
          <item>
           <widget class="QPushButton" name="m_cmdShowInfo">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
             <string>&amp;Show info</string>
            </property>
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="m_cmdAbout">
+           <property name="text">
+            <string>&amp;About</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="m_cmdAboutQt">
            <property name="text">
-            <string>&amp;About Qt</string>
+            <string>About &amp;Qt</string>
            </property>
           </widget>
          </item>
@@ -151,12 +171,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>m_infoTable</tabstop>
-  <tabstop>m_dirsTree</tabstop>
-  <tabstop>m_dirsContentsList</tabstop>
   <tabstop>m_cmdShowInfo</tabstop>
+  <tabstop>m_cmdAbout</tabstop>
   <tabstop>m_cmdAboutQt</tabstop>
   <tabstop>m_cmdExit</tabstop>
+  <tabstop>m_dirsTree</tabstop>
+  <tabstop>m_dirsContentsList</tabstop>
+  <tabstop>m_infoTable</tabstop>
  </tabstops>
  <resources/>
  <connections>

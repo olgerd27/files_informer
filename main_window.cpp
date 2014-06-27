@@ -1,5 +1,6 @@
 #include <QFileSystemModel>
 #include <QSortFilterProxyModel>
+#include <QMessageBox>
 #include <QDebug> // TODO: delete
 
 #include "main_window.h"
@@ -88,6 +89,7 @@ void MainWindow::setDirsViews()
 void MainWindow::setButtons()
 {
     connect(ui->m_cmdShowInfo, SIGNAL(clicked()), SLOT(slotGetFileInfo()));
+    connect(ui->m_cmdAbout, SIGNAL(clicked()), SLOT(slotAboutApp()));
     connect(ui->m_cmdAboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
 }
 
@@ -133,4 +135,17 @@ void MainWindow::slotActivatedOnlyDirs(const QModelIndex &index)
 void MainWindow::slotGetFileInfo()
 {
     qDebug() << "file info";
+}
+
+void MainWindow::slotAboutApp()
+{
+    QString title = QString("About ") + windowTitle();
+    QString text = QString("The <b>") + windowTitle() + "</b> application.<br>"
+                   "<b>Version 1.0</b> (freeware).<br><br>"
+                   "The programm is provided \"AS IS\" with no warranty of any kind,"
+                   "including the warranty of defign, merchantability and"
+                   "fitness for a particular purpose.<br><br>"
+                   "Copyright: (C) M.O.I., e-mail: olgerd27@gmail.com.<br>"
+                   "Mykolayiv, Ukraine - 2014.";
+    QMessageBox::about(this, tr(title.toStdString().c_str()), tr(text.toStdString().c_str()));
 }

@@ -36,6 +36,7 @@ private slots:
     void slotSetTreeCurrentIndex(const QModelIndex &indexList);
     void slotActivatedOnlyDirs(const QModelIndex &index);
     void slotGetFileInfo();
+    void slotAboutApp();
 };
 
 #endif // MAIN_WINDOW_H
