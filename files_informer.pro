@@ -7,11 +7,13 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     main_window.cpp \
-    dir_tree.cpp
+    dir_tree.cpp \
+    checkbox_delegate.cpp
 
 HEADERS += \
     main_window.h \
-    dir_tree.h
+    dir_tree.h \
+    checkbox_delegate.h
 
 FORMS += \
     main_window.ui

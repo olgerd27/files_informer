@@ -5,6 +5,7 @@
 
 #include "main_window.h"
 #include "ui_main_window.h"
+#include "checkbox_delegate.h"
 
 /*
  * Customs sort filter proxy models
@@ -73,6 +74,7 @@ void MainWindow::setDirsViews()
 
     ui->m_dirsTree->setModel(m_dirsModel);
     ui->m_dirsContentsList->setModel(m_dirsContentsModel);
+    ui->m_dirsContentsList->setItemDelegate(new CheckBoxDelegate());
 
     // hide columns
     for(int i = 1; i < ui->m_dirsTree->header()->count(); ++i)
@@ -142,8 +144,8 @@ void MainWindow::slotAboutApp()
     QString title = QString("About ") + windowTitle();
     QString text = QString("The <b>") + windowTitle() + "</b> application.<br>"
                    "<b>Version 1.0</b> (freeware).<br><br>"
-                   "The programm is provided \"AS IS\" with no warranty of any kind,"
-                   "including the warranty of defign, merchantability and"
+                   "The programm is provided \"AS IS\" with no warranty of any kind, "
+                   "including the warranty of defign, merchantability and "
                    "fitness for a particular purpose.<br><br>"
                    "Copyright: (C) M.O.I., e-mail: olgerd27@gmail.com.<br>"
                    "Mykolayiv, Ukraine - 2014.";
