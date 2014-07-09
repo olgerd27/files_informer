@@ -17,3 +17,5 @@ FORMS += \
     main_window.ui
 
 RESOURCES +=
+
+RC_FILE += icoset.rc
