@@ -16,6 +16,7 @@ HEADERS += \
 FORMS += \
     main_window.ui
 
-RESOURCES +=
+RESOURCES += \
+    images.qrc
 
 RC_FILE += icoset.rc

@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setModels();
     setWidgets();
+    setWindowIcon(QIcon(":/images/window_icon.png"));
 }
 
 void MainWindow::setModels()
