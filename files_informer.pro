@@ -7,7 +7,11 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     main_window.cpp \
-    dir_tree.cpp
+    dir_tree.cpp \
+#    q_sort_filter_proxy_model.cpp
+#    q_file_system_model.cpp
+#    q_standard_item_model.cpp
+
 
 HEADERS += \
     main_window.h \

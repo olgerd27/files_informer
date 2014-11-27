@@ -32,7 +32,7 @@
          <widget class="QWidget" name="layoutWidget">
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="DirTree" name="m_dirsTree">
+            <widget class="DirTree" name="m_leftTreeDirs">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -41,7 +41,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>0</width>
+               <width>200</width>
                <height>0</height>
               </size>
              </property>
@@ -65,13 +65,31 @@
            </item>
           </layout>
          </widget>
-         <widget class="QListView" name="m_dirsContentsList">
+         <widget class="QTableView" name="m_rightTableInfo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>300</width>
             <height>0</height>
            </size>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </widget>
        </item>
@@ -91,7 +109,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_cmdShowInfo">
+          <widget class="QPushButton" name="m_cmdShowSummInfo">
            <property name="minimumSize">
             <size>
              <width>100</width>
@@ -106,7 +124,7 @@
             </font>
            </property>
            <property name="text">
-            <string>&amp;Show info</string>
+            <string>&amp;Show  summary info</string>
            </property>
           </widget>
          </item>
@@ -145,20 +163,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QTableView" name="m_infoTable">
-      <property name="minimumSize">
-       <size>
-        <width>500</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="locale">
-       <locale language="Russian" country="Ukraine"/>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-     </widget>
+     <widget class="QListView" name="m_belowListSummary"/>
     </widget>
    </item>
   </layout>
@@ -171,13 +176,11 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>m_cmdShowInfo</tabstop>
+  <tabstop>m_cmdShowSummInfo</tabstop>
   <tabstop>m_cmdAbout</tabstop>
   <tabstop>m_cmdAboutQt</tabstop>
   <tabstop>m_cmdExit</tabstop>
-  <tabstop>m_dirsTree</tabstop>
-  <tabstop>m_dirsContentsList</tabstop>
-  <tabstop>m_infoTable</tabstop>
+  <tabstop>m_leftTreeDirs</tabstop>
  </tabstops>
  <resources/>
  <connections>

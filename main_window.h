@@ -4,8 +4,8 @@
 #include <QWidget>
 
 class QFileSystemModel;
-class FilterDirsProxyModel;
-class SortFilesDirsProxyModel;
+class LeftViewProxyModel;
+class RightViewProxyModel;
 class QModelIndex;
 
 namespace Ui {
@@ -23,13 +23,15 @@ public:
 private:
     void setModels();
     void setWidgets();
-    void setDirsViews();
+    void setViews();
+    void setLeftView();
+    void setRightView();
     void setButtons();
 
     Ui::MainWindow *ui;
     QFileSystemModel *m_FSmodel;
-    FilterDirsProxyModel *m_dirsModel;
-    SortFilesDirsProxyModel *m_dirsContentsModel;
+    LeftViewProxyModel *m_dirsModel;
+    RightViewProxyModel *m_dirsContentsModel;
 
 private slots:
     void slotSetListRootIndex(const QModelIndex &indexTree);
