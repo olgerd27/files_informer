@@ -7,8 +7,8 @@
 #include "ui_main_window.h"
 #include "file_system_custom_model.h"
 
-#ifdef TXP_DBGOUT_QT
-#include "modeltest/modeltest.h" // NOTE: for testing
+#ifdef TEST_MODEL
+#include "modeltest/modeltest.h"
 #endif
 
 /*
