@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-class QFileSystemModel;
+class FileSystemCustomModel;
 class LeftViewProxyModel;
 class RightViewProxyModel;
 class QModelIndex;
@@ -29,13 +29,13 @@ private:
     void setButtons();
 
     Ui::MainWindow *ui;
-    QFileSystemModel *m_FSmodel;
+    FileSystemCustomModel *m_FSmodel;
     LeftViewProxyModel *m_dirsModel;
     RightViewProxyModel *m_dirsContentsModel;
 
 private slots:
-    void slotSetListRootIndex(const QModelIndex &indexTree);
-    void slotSetTreeCurrentIndex(const QModelIndex &indexList);
+    void slotSetRightViewRootIndex(const QModelIndex &indexTree);
+    void slotSetLeftViewCurrentIndex(const QModelIndex &indexList);
     void slotActivatedOnlyDirs(const QModelIndex &index);
     void slotGetFileInfo();
     void slotAboutApp();
