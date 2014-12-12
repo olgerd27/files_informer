@@ -22,14 +22,12 @@ QVariant FileSystemCustomModel::data(const QModelIndex &index, int role) const
     case ihh_Size:
         data = QFileSystemModel::data(index, role); break;
     case ihh_Type:
-        if(role == Qt::DisplayRole)
-            data = QVariant(linesQuantity());
-        else if(role == Qt::TextAlignmentRole) { // set text alignment as in "Size" column
+        if(role == Qt::TextAlignmentRole) { // set text alignment as in the "Size" column
             sourceModelIndex = QFileSystemModel::index(index.row(), ihh_Size, index.parent());
             data = QFileSystemModel::data(sourceModelIndex, role);
         }
         break;
-    case ihh_DataModified:
+    case ihh_Modified:
         if(role == Qt::DisplayRole) {
             sourceModelIndex = QFileSystemModel::index(index.row(), ihh_Type, index.parent());
             data = QFileSystemModel::data(sourceModelIndex, role);
@@ -40,7 +38,7 @@ QVariant FileSystemCustomModel::data(const QModelIndex &index, int role) const
         }
         break;
     case ihh_Empty:
-        sourceModelIndex = QFileSystemModel::index(index.row(), ihh_DataModified, index.parent());
+        sourceModelIndex = QFileSystemModel::index(index.row(), ihh_Modified, index.parent());
         data = QFileSystemModel::data(sourceModelIndex, role);
         break;
     }
@@ -58,10 +56,10 @@ QVariant FileSystemCustomModel::headerData(int section, Qt::Orientation orientat
             name = QFileSystemModel::headerData(ihh_Size, orientation); break;
         case ihh_Type:
             name = QVariant("Lines"); break;
-        case ihh_DataModified:
+        case ihh_Modified:
             name = QFileSystemModel::headerData(ihh_Type, orientation); break;
         case ihh_Empty:
-            name = QFileSystemModel::headerData(ihh_DataModified, orientation); break;
+            name = QFileSystemModel::headerData(ihh_Modified, orientation); break;
         }
     }
 //        else
@@ -71,10 +69,11 @@ QVariant FileSystemCustomModel::headerData(int section, Qt::Orientation orientat
 
 int FileSystemCustomModel::columnCount(const QModelIndex &parent) const
 {
-return QFileSystemModel::columnCount(parent) + 1;
+    return QFileSystemModel::columnCount(parent) + 1;
 }
 
-qlonglong FileSystemCustomModel::linesQuantity() const
-{
-    return 555L;
-}
+//Qt::ItemFlags FileSystemCustomModel::flags(const QModelIndex &index) const
+//{
+//    Qt::ItemFlags flags = QFileSystemModel::flags(index);
+//    return index.isValid() ? (flags | Qt::ItemIsEditable) : flags;
+//}

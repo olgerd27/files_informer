@@ -18,23 +18,33 @@ class FileSystemCustomModel : public QFileSystemModel
 {
     Q_OBJECT
 public:
+    // table columns structure after adding new column "Lines" (from left to right)
+    enum resHorizHeaderNames
+    {
+        rhh_Name = 0,
+        rhh_Size,
+        rhh_Lines,
+        rhh_Type,
+        rhh_Modified
+    };
+
     explicit FileSystemCustomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     int columnCount(const QModelIndex &parent) const;
+//    Qt::ItemFlags flags(const QModelIndex &index) const;
 
 private:
+    // initial table columns structure (from left to right)
     enum initHorizHeaderNames
     {
         ihh_Name = 0,
-        ihh_Size = 1,
-        ihh_Type = 2,
-        ihh_DataModified = 3,
-        ihh_Empty = 4,
+        ihh_Size,
+        ihh_Type,
+        ihh_Modified,
+        ihh_Empty,
     };
-
-    qlonglong linesQuantity() const;
 };
 
 #endif // FILE_SYSTEM_CUSTOM_MODEL_H

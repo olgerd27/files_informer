@@ -7,6 +7,7 @@ class FileSystemCustomModel;
 class LeftViewProxyModel;
 class RightViewProxyModel;
 class QModelIndex;
+class QItemSelection;
 
 namespace Ui {
     class MainWindow;
@@ -27,6 +28,7 @@ private:
     void setLeftView();
     void setRightView();
     void setButtons();
+    bool isDir(const QModelIndex &index) const;
 
     Ui::MainWindow *ui;
     FileSystemCustomModel *m_FSmodel;
@@ -37,7 +39,8 @@ private slots:
     void slotSetRightViewRootIndex(const QModelIndex &indexTree);
     void slotSetLeftViewCurrentIndex(const QModelIndex &indexList);
     void slotActivatedOnlyDirs(const QModelIndex &index);
-    void slotGetFileInfo();
+    void slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected);
+    void slotGetFileInfo(const QModelIndex &index);
     void slotAboutApp();
 };
 

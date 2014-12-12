@@ -11,6 +11,7 @@ SOURCES += \
     main_window.cpp \
     dir_tree.cpp \
     file_system_custom_model.cpp \
+    lines_counter.cpp
 #    q_sort_filter_proxy_model.cpp \
 #    q_file_system_model.cpp \
 #    q_standard_item_model.cpp \
@@ -23,7 +24,8 @@ contains(DEFINES, TEST_MODEL) {
 HEADERS += \
     main_window.h \
     dir_tree.h \
-    file_system_custom_model.h
+    file_system_custom_model.h \
+    lines_counter.h
 
 FORMS += \
     main_window.ui

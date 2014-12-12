@@ -6,6 +6,7 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "file_system_custom_model.h"
+#include "lines_counter.h"
 
 #ifdef TEST_MODEL
 #include "modeltest/modeltest.h"
@@ -104,22 +105,37 @@ void MainWindow::setRightView()
     QTableView *view = ui->m_rightTableInfo;
     view->setModel(m_dirsContentsModel);
     view->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-//    view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // user cannot resize
-    view->horizontalHeader()->resizeSection(0, 280); // user can resize
-    //    view->resizeRowsToContents();
-    //    view->horizontalHeader()->setSectionResizeMode(view->horizontalHeader()->count() - 1, QHeaderView::ResizeToContents);
+    view->horizontalHeader()->resizeSection(0, 280); // 'Name' section. User can resize
+    view->horizontalHeader()->resizeSection(3, 130); // 'Type' section
 
     connect(view, SIGNAL(activated(QModelIndex)),
             this, SLOT(slotSetLeftViewCurrentIndex(QModelIndex)));
     connect(view, SIGNAL(activated(QModelIndex)),
             this, SLOT(slotActivatedOnlyDirs(QModelIndex)));
+    connect(view->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+            this, SLOT(slotUpdateSelection(QItemSelection,QItemSelection)));
+//    connect(view, SIGNAL(pressed(QModelIndex)),
+//            this, SLOT(slotGetFileInfo(QModelIndex)));
 }
 
 void MainWindow::setButtons()
 {
-    connect(ui->m_cmdShowSummInfo, SIGNAL(clicked()), SLOT(slotGetFileInfo()));
+//    connect(ui->m_cmdShowSummInfo, SIGNAL(clicked()), SLOT(slotGetFileInfo())); // NOTE: maybe this is not need else
     connect(ui->m_cmdAbout, SIGNAL(clicked()), SLOT(slotAboutApp()));
     connect(ui->m_cmdAboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
+}
+
+bool MainWindow::isDir(const QModelIndex &index) const
+{
+    bool isdir = false;
+    const QSortFilterProxyModel *proxyModel = 0;
+    QFileSystemModel *sourceModel = 0;
+    if( !( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) ||
+        !( sourceModel = dynamic_cast<QFileSystemModel *>(proxyModel->sourceModel()) ) )
+        isdir = false;
+    else
+        isdir = sourceModel->isDir( proxyModel->mapToSource(index) );
+    return isdir;
 }
 
 MainWindow::~MainWindow()
@@ -161,17 +177,89 @@ void MainWindow::slotSetLeftViewCurrentIndex(const QModelIndex &indexList)
  */
 void MainWindow::slotActivatedOnlyDirs(const QModelIndex &index)
 {
-    const QSortFilterProxyModel *model = dynamic_cast<const QSortFilterProxyModel*>(index.model());
-    QModelIndex indexSource = model->mapToSource(index);
-    if( QFileSystemModel *sourceModel = dynamic_cast<QFileSystemModel *>(model->sourceModel()) )
-        if(sourceModel->isDir(indexSource))
-            if( QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(sender()) )
-                view->setRootIndex(index);
+    QAbstractItemView *view = 0;
+    if(isDir(index) && (view = dynamic_cast<QAbstractItemView *>(sender()) ) )
+        view->setRootIndex(index);
 }
 
-void MainWindow::slotGetFileInfo()
+void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    qDebug() << "summary file info";
+    qDebug() << "***** selection changed *****";
+    const QSortFilterProxyModel *proxyModel = 0;
+    FileSystemCustomModel *sourceModel = 0;
+    QModelIndex sourceIndex;
+
+    qDebug() << "selected items:";
+    QModelIndexList indexes = selected.indexes();
+    QModelIndex index, indexSourceLines;
+    LinesCounter linesCounter;
+    QFileInfo fileInfo;
+    foreach (index, indexes) {
+        if(index.column() == FileSystemCustomModel::rhh_Name) {
+            if( ( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) &&
+                ( sourceModel = dynamic_cast<FileSystemCustomModel*>(proxyModel->sourceModel()) ) ) {
+                qDebug() << "proxy index. row:" << index.row() << ", col:" << index.column();
+                sourceIndex = proxyModel->mapToSource(index);
+
+                fileInfo = sourceModel->fileInfo(sourceIndex);
+                if(fileInfo.isFile() && fileInfo.isReadable() && !fileInfo.isExecutable()) {
+                    linesCounter.setFileName( fileInfo.absoluteFilePath().toStdString() );
+                    qDebug() << "Lines:" << linesCounter.getLinesQuantity();
+                }
+                else
+                    qDebug() << "CANNOT read this item";
+
+                indexSourceLines = sourceModel->index(sourceIndex.row(), FileSystemCustomModel::rhh_Lines);
+                if( sourceModel->setData(indexSourceLines, "-555", Qt::EditRole) )
+//                if( sourceModel->setData(sourceModel->index(index.row(), index.column()), "-555", Qt::EditRole) )
+                    qDebug() << "Set data - OK";
+                else
+                    qDebug() << "Set data - NO OK";
+                qDebug() << "row:" << indexSourceLines.row() << ", col:" << indexSourceLines.column()
+                         << "data:" << indexSourceLines.data(Qt::EditRole);
+            }
+        }
+    }
+
+    qDebug() << "deselected items:";
+    indexes = deselected.indexes();
+    foreach (index, indexes) {
+        if(index.column() == FileSystemCustomModel::rhh_Name) {
+            if( ( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) &&
+                ( sourceModel = dynamic_cast<FileSystemCustomModel*>(proxyModel->sourceModel()) ) ) {
+                qDebug() << "proxy index. row:" << index.row() << ", col:" << index.column();
+                sourceIndex = proxyModel->mapToSource(index);
+                sourceModel->setData(sourceIndex, QVariant(), Qt::EditRole);
+            }
+        }
+    }
+}
+
+void MainWindow::slotGetFileInfo(const QModelIndex &index)
+{
+    /*
+     * Not use the MainWindow::isDir() function, because it recognize only dirs,
+     * but dirs there are can to be symbolic link or shortcut on Windows.
+     * Using the QFileInfo class for recognition only redeable and not executable files.
+     */
+    Qt::MouseButtons mouseBtns = QApplication::mouseButtons();
+    const QSortFilterProxyModel *proxyModel = 0;
+    QFileSystemModel *sourceModel = 0;
+    if(mouseBtns & Qt::LeftButton) {
+        // get a models
+        if( !(proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) ||
+            !(sourceModel = dynamic_cast<QFileSystemModel *>(proxyModel->sourceModel()) ) )
+            return;
+        QFileInfo fileInfo = sourceModel->fileInfo( proxyModel->mapToSource(index) );
+        if(fileInfo.isFile() && fileInfo.isReadable() && !fileInfo.isExecutable()) {
+            bool isSelected = ui->m_rightTableInfo->selectionModel()->isSelected(index);
+            if(isSelected)
+                qDebug() << fileInfo.absoluteFilePath();
+            else
+                qDebug() << "is NOT selected";
+        }
+        //        qDebug() << "col:" << index.column() << "row:" << index.row();
+    }
 }
 
 void MainWindow::slotAboutApp()
