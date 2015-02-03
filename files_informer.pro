@@ -11,10 +11,12 @@ SOURCES += \
     main_window.cpp \
     dir_tree.cpp \
     file_system_custom_model.cpp \
-    lines_counter.cpp
+    lines_counter.cpp \
 #    q_sort_filter_proxy_model.cpp \
 #    q_file_system_model.cpp \
 #    q_standard_item_model.cpp \
+#    q_abstract_item_view.cpp
+#    q_table_view.cpp
 
 contains(DEFINES, TEST_MODEL) {
     build_pass:!message(Perform the model testing)

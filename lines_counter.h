@@ -2,8 +2,9 @@
 #define LINES_COUNTER_H
 
 #include <string>
+#include <qglobal.h>
 
-typedef long t_linesCount;
+typedef qlonglong t_linesCount;
 
 class LinesCounter
 {
@@ -17,7 +18,7 @@ public:
     void setFileName(const std::string &fileName);
     std::string fileName() const;
 
-    t_linesCount getLinesQuantity();
+    t_linesCount countLines();
 
 private:
     std::string m_filePathName;

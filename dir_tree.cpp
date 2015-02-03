@@ -17,7 +17,7 @@ public:
     void paint(QPainter *painter,
                const QStyleOptionViewItem &option,
                const QModelIndex          &index) const {
-        if(option.state & QStyle::State_MouseOver) {
+        if (option.state & QStyle::State_MouseOver) {
             QRect rect = option.rect;
             QLinearGradient gradient(0, 0, rect.width(), rect.height());
             gradient.setColorAt(0, Qt::lightGray);
@@ -28,7 +28,7 @@ public:
             painter->drawRect(rect);
         }
         QItemDelegate::paint(painter, option, index); // paint part of the base class
-    }
+    } 
 };
 
 /*
