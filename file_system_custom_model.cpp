@@ -124,6 +124,7 @@ void FileSystemCustomModel::setLinesQuantity(int index, t_linesCount value)
     if(index < 0 || index >= m_linesQnties.size())
         throw std::runtime_error( QString("FileSystemCustomModel::setLinesQuantity()\ninvalid index = %1").arg(index).toStdString() );
     m_linesQnties[index] = value;
+    qDebug() << "model::setLinesQuantity(): index =" << index << ", data =" << value << ", all data =" << m_linesQnties;
 }
 
 t_linesCount FileSystemCustomModel::getLinesQuantity(int index) const
@@ -138,7 +139,7 @@ void FileSystemCustomModel::resizeLinesQuantity(int size)
     if (!m_linesQnties.isEmpty())
         m_linesQnties.clear();
     m_linesQnties.fill(empty_value, size);
-    qDebug() << "model::resize():" << m_linesQnties << ", size =" << m_linesQnties.size();
+    qDebug() << "<!!!>model::resize():" << m_linesQnties << ", size =" << m_linesQnties.size();
 }
 
 bool FileSystemCustomModel::canCalcLines(const QModelIndex &indexSource) const

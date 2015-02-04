@@ -107,6 +107,8 @@ void MainWindow::setLeftView()
 
     connect(view, SIGNAL(clicked(QModelIndex)),
             this, SLOT(slotSetRightViewRootIndex(QModelIndex)));
+    connect(view, SIGNAL(clicked(QModelIndex)),
+            ui->m_rightTableInfo, SLOT(clearSelection()));
 }
 
 void MainWindow::setRightView()
@@ -121,6 +123,8 @@ void MainWindow::setRightView()
             this, SLOT(slotSetLeftViewCurrentIndex(QModelIndex)));
     connect(view, SIGNAL(activated(QModelIndex)),
             this, SLOT(slotActivatedOnlyDirs(QModelIndex)));
+    connect(view, SIGNAL(activated(QModelIndex)),
+            view, SLOT(clearSelection()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(slotUpdateSelection(QItemSelection,QItemSelection)));
 //    connect(view, SIGNAL(pressed(QModelIndex)),
@@ -134,18 +138,14 @@ void MainWindow::setButtons()
     connect(ui->m_cmdAboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
 }
 
-bool MainWindow::isDir(const QModelIndex &index) const
+bool MainWindow::isDir(const QModelIndex &indexProxy) const
 {
-    // TODO: make simple - use the proxy and source model pointer, stored in MainWindow, directly
-    bool isdir = false;
     const QSortFilterProxyModel *proxyModel = 0;
     QFileSystemModel *sourceModel = 0;
-    if ( !( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) ||
-        !( sourceModel = dynamic_cast<QFileSystemModel *>(proxyModel->sourceModel()) ) )
-        isdir = false;
-    else
-        isdir = sourceModel->isDir( proxyModel->mapToSource(index) );
-    return isdir;
+    if ( !( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(indexProxy.model()) ) ||
+         !( sourceModel = dynamic_cast<QFileSystemModel*>(proxyModel->sourceModel()) ) )
+        return false;
+    return sourceModel->isDir( proxyModel->mapToSource(indexProxy) );
 }
 
 /*
@@ -163,14 +163,6 @@ void MainWindow::slotSetRightViewRootIndex(const QModelIndex &indexTree)
 
 //    m_FSmodel->resizeLinesQuantity( indexSource.model()->rowCount(indexSource) );
 //    m_FSmodel->resizeLinesQuantity(10);
-
-    // my proba
-    //    ui->m_rightTableInfo->model()->insertColumn(2, ui->m_rightTableInfo->model()->index(0, 2, indexProxyModel));
-    //    qDebug() << "count =" << ui->m_rightTableInfo->horizontalHeader()->count();
-
-    // from the inet - adding check box in a separated, first column
-    //    model->setData(index, Qt::Checked, Qt::CheckStateRole);
-    //    model->setData(index, "any string", Qt::DisplayRole);
 }
 
 void MainWindow::slotSetLeftViewCurrentIndex(const QModelIndex &indexList)
@@ -189,6 +181,7 @@ void MainWindow::slotActivatedOnlyDirs(const QModelIndex &index)
     QAbstractItemView *view = 0;
     if (isDir(index) && (view = dynamic_cast<QAbstractItemView *>(sender()) ) )
         view->setRootIndex(index);
+
 //    qDebug() << "ROWS1 =" << view->model()->rowCount(index.parent());
 //    qDebug() << "ROWS2 =" << index.model()->rowCount(index.parent());
 //    qDebug() << "ROWS3 =" << m_FSmodel->rowCount(index.parent());
@@ -203,36 +196,48 @@ void MainWindow::slotDirectoryWasLoaded(const QString &dir)
 
 void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected)
 {
-//    qDebug() << "\n***** selection changed *****";
+    qDebug() << "\n***** selection changed *****";
     const QSortFilterProxyModel *proxyModel = 0;
     FileSystemCustomModel *sourceModel = 0;
-    QModelIndex index, indexSource;
+    QModelIndex index, indexSource, indexParentSelected;
+    QModelIndexList indexes;
+//    bool parentDefined = false;
 
-//    qDebug() << "   selected items:";
+    qDebug() << "   selected items:";
     LinesCounter linesCounter;
-    QModelIndexList indexes = selected.indexes();
+    indexes = selected.indexes();
     foreach (index, indexes) {
         if (index.column() == FileSystemCustomModel::rhh_Name) {
             if ( ( proxyModel = dynamic_cast<const QSortFilterProxyModel*>(index.model()) ) &&
                 ( sourceModel = dynamic_cast<FileSystemCustomModel*>(proxyModel->sourceModel()) ) ) {
                 indexSource = proxyModel->mapToSource(index);
                 if ( sourceModel->canCalcLines(indexSource) ) {
-//                    qDebug() << "row =" << indexSource.row() << ":" << sourceModel->filePath(indexSource);
+                    qDebug() << "SELECTED index parent =" << index.parent().data();
                     try {
                         linesCounter.setFileName( sourceModel->filePath(indexSource).toStdString() );
                         sourceModel->setLinesQuantity( indexSource.row(), linesCounter.countLines() );
+                        qDebug() << "row =" << indexSource.row() << ":" << sourceModel->filePath(indexSource)
+                                 << ", lines =" << sourceModel->getLinesQuantity(indexSource.row());
                     }
                     catch(std::exception &ex) {
-                        QMessageBox::warning( this, tr("Error count file lines"), tr(ex.what()) );
+                        QMessageBox::warning( this, tr("Error show file lines"), tr(ex.what()) );
                     }
-//                    qDebug() << "CAN read this item, index =" << indexSource.row() << ", lines =" << sourceModel->getLinesQuantity(indexSource.row());
+
+                    // define the parent index for perform the correct selection and deselection
+//                    if(!parentDefined) {
+//                        indexParentSelected = index.parent();
+//                        parentDefined = true;
+//                    }
+
                 }
 //                else qDebug() << "CANNOT read this item";
             }
         }
     }
 
-//    qDebug() << "   deselected items:";
+//    QMessageBox::information(this, "Debug", "Stop");
+
+    qDebug() << "   deselected items:";
     indexes = deselected.indexes();
     foreach (index, indexes) {
         if (index.column() == FileSystemCustomModel::rhh_Name) {
@@ -240,12 +245,19 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
                 ( sourceModel = dynamic_cast<FileSystemCustomModel*>(proxyModel->sourceModel()) ) ) {
                 indexSource = proxyModel->mapToSource(index);
                 if ( sourceModel->canCalcLines(indexSource) ) {
-                    sourceModel->setLinesQuantity( indexSource.row(), FileSystemCustomModel::empty_value );
+                    qDebug() << "DESELECTED index parent =" << index.parent().data();
+                    try {
+//                        if(index.parent() == indexParentSelected)
+                            sourceModel->setLinesQuantity( indexSource.row(), FileSystemCustomModel::empty_value );
+                    }
+                    catch(std::exception &ex) {
+                        QMessageBox::warning( this, tr("Error hide file lines"), tr(ex.what()) );
+                    }
                 }
             }
         }
     }
-//    qDebug() << "***** selection END *****";
+    qDebug() << "***** selection END *****";
 }
 
 void MainWindow::slotGetFileInfo(const QModelIndex &index)

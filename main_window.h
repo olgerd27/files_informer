@@ -28,7 +28,7 @@ private:
     void setLeftView();
     void setRightView();
     void setButtons();
-    bool isDir(const QModelIndex &index) const;
+    bool isDir(const QModelIndex &indexProxy) const;
 
     Ui::MainWindow *ui;
     FileSystemCustomModel *m_FSmodel;
