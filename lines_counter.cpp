@@ -24,13 +24,13 @@ std::string LinesCounter::fileName() const
     return m_filePathName;
 }
 
-t_linesCount LinesCounter::countLines()
+t_linesQnty LinesCounter::countLines()
 {
     std::ifstream in(m_filePathName.c_str());
     if (!in.is_open())
         throw std::runtime_error( std::string("LinesCounter::countLines()\ncannot open file: ") + m_filePathName );
     std::string str;
-    t_linesCount lines = 0L;
+    t_linesQnty lines = 0L;
     while (std::getline(in, str)) { ++lines; }
     in.close();
     return lines;

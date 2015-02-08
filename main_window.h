@@ -6,6 +6,7 @@
 class FileSystemCustomModel;
 class LeftViewProxyModel;
 class RightViewProxyModel;
+class FileInfoListModel;
 class QModelIndex;
 class QItemSelection;
 
@@ -27,13 +28,17 @@ private:
     void setViews();
     void setLeftView();
     void setRightView();
+    void setBottomView();
     void setButtons();
+
     bool isDir(const QModelIndex &indexProxy) const;
+    void resetRightView(const QModelIndex &index);
 
     Ui::MainWindow *ui;
     FileSystemCustomModel *m_FSmodel;
     LeftViewProxyModel *m_dirsModel;
     RightViewProxyModel *m_dirsContentsModel;
+    FileInfoListModel *m_infoModel;
 
 private slots:
     void slotSetRightViewRootIndex(const QModelIndex &indexTree);
@@ -42,6 +47,10 @@ private slots:
     void slotDirectoryWasLoaded(const QString &dir);
     void slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected);
     void slotAboutApp();
+
+signals:
+    void sigUpdateFileInfo(long size, long lines);
+    void sigRightViewResetted();
 };
 
 #endif // MAIN_WINDOW_H

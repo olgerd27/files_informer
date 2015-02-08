@@ -1,5 +1,6 @@
 #include <QFileSystemModel>
 #include <QSortFilterProxyModel>
+#include "file_info_list_model.h"
 #include <QMessageBox>
 #include <QDebug> // TODO: delete
 
@@ -58,6 +59,7 @@ MainWindow::~MainWindow()
     delete m_FSmodel;
     delete m_dirsModel;
     delete m_dirsContentsModel;
+    delete m_infoModel;
 }
 
 void MainWindow::setModels()
@@ -75,6 +77,11 @@ void MainWindow::setModels()
     m_dirsContentsModel->setSourceModel(m_FSmodel);
     m_dirsContentsModel->sort(0, Qt::AscendingOrder);
 
+    // files info list model
+    m_infoModel = new FileInfoListModel;
+    connect(this, SIGNAL(sigUpdateFileInfo(long,long)), m_infoModel, SLOT(slotChangeFileInfo(long,long)));
+    connect(this, SIGNAL(sigRightViewResetted()), m_infoModel, SLOT(slotClearFileInfo()));
+
 #ifdef TEST_MODEL
     ModelTest *modelTest = new ModelTest(m_dirsContentsModel, this);
 #endif
@@ -85,10 +92,6 @@ void MainWindow::setWidgets()
     ui = new Ui::MainWindow;
     setViews();
     setButtons();
-    //    ui->m_rightTableInfo->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    //    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
-    //    resize(minimumSize());
-    //    ui->m_rightTableInfo->adjustSize();
 }
 
 void MainWindow::setViews()
@@ -96,6 +99,7 @@ void MainWindow::setViews()
     ui->setupUi(this);
     setLeftView();
     setRightView();
+    setBottomView();
 }
 
 void MainWindow::setLeftView()
@@ -129,6 +133,12 @@ void MainWindow::setRightView()
             this, SLOT(slotUpdateSelection(QItemSelection,QItemSelection)));
 }
 
+void MainWindow::setBottomView()
+{
+    QListView *view = ui->m_bottomListSummary;
+    view->setModel(m_infoModel);
+}
+
 void MainWindow::setButtons()
 {
     connect(ui->m_cmdAbout, SIGNAL(clicked()), SLOT(slotAboutApp()));
@@ -145,6 +155,13 @@ bool MainWindow::isDir(const QModelIndex &indexProxy) const
     return sourceModel->isDir( proxyModel->mapToSource(indexProxy) );
 }
 
+void MainWindow::resetRightView(const QModelIndex &index)
+{
+    int rows = index.model()->rowCount(index);
+    if (rows != 0) m_FSmodel->resizeLinesQuantity(rows);
+    emit sigRightViewResetted();
+}
+
 /*
  * MainWindow slots
  */
@@ -153,14 +170,7 @@ void MainWindow::slotSetRightViewRootIndex(const QModelIndex &indexTree)
     QModelIndex indexSource = m_dirsModel->mapToSource(indexTree);
     QModelIndex indexProxyModel = m_dirsContentsModel->mapFromSource(indexSource);
     ui->m_rightTableInfo->setRootIndex(indexProxyModel);
-
-//    qDebug() << "ROWS4 =" << indexSource.model()->rowCount(indexSource);
-//    qDebug() << "ROWS5 =" << indexProxyModel.model()->rowCount(indexProxyModel);
-//    qDebug() << "ROWS6 =" << m_dirsContentsModel->rowCount(indexProxyModel);
-
-//    qDebug() << "INDEX 1, value:" << indexSource.data() << ", rows:" << indexSource.model()->rowCount(indexSource);
-    int rows = indexSource.model()->rowCount(indexSource);
-    if (rows != 0) m_FSmodel->resizeLinesQuantity(rows);
+    resetRightView(indexSource);
 }
 
 void MainWindow::slotSetLeftViewCurrentIndex(const QModelIndex &indexList)
@@ -179,31 +189,24 @@ void MainWindow::slotActivatedOnlyDirs(const QModelIndex &index)
     QAbstractItemView *view = 0;
     if (isDir(index) && (view = dynamic_cast<QAbstractItemView *>(sender()) ) )
         view->setRootIndex(index);
-
-//    qDebug() << "ROWS1 =" << view->model()->rowCount(index.parent());
-//    qDebug() << "ROWS2 =" << index.model()->rowCount(index.parent());
-//    qDebug() << "ROWS3 =" << m_FSmodel->rowCount(index.parent());
-
-//    qDebug() << "INDEX 2, value:" << index.data() << ", rows:" << index.model()->rowCount(index);
-    int rows = index.model()->rowCount(index);
-    if (rows != 0) m_FSmodel->resizeLinesQuantity(rows);
+    resetRightView(index);
 }
 
 void MainWindow::slotDirectoryWasLoaded(const QString &dir)
 {
-//    qDebug() << "path =" << dir << ",  rows =" << m_FSmodel->rowCount(m_FSmodel->index(dir));
-    m_FSmodel->resizeLinesQuantity( m_FSmodel->rowCount(m_FSmodel->index(dir)) );
+    resetRightView( m_FSmodel->index(dir) );
 }
 
 void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    qDebug() << "\n***** selection changed *****";
+//    qDebug() << "\n***** selection changed *****";
     const QSortFilterProxyModel *proxyModel = 0;
     FileSystemCustomModel *sourceModel = 0;
     QModelIndex index, indexSource;
     QModelIndexList indexes;
 
-    qDebug() << "   selected items:";
+//    qDebug() << "   selected items:";
+    t_linesQnty lines = 0;
     LinesCounter linesCounter;
     indexes = selected.indexes();
     foreach (index, indexes) {
@@ -213,24 +216,27 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
                 continue;
 
             indexSource = proxyModel->mapToSource(index);
-            if ( !sourceModel->canCalcLines(indexSource) )
+            if ( !sourceModel->canCalcLines(indexSource) ) // check can whether count lines of this file
                 continue;
 
+            // set the lines quantity value of the selected file
             try {
                 linesCounter.setFileName( sourceModel->filePath(indexSource).toStdString() );
-                sourceModel->setLinesQuantity( indexSource.row(), linesCounter.countLines() );
-                qDebug() << "row =" << indexSource.row() << ":" << sourceModel->filePath(indexSource)
-                         << ", lines =" << sourceModel->getLinesQuantity(indexSource.row());
+                lines = linesCounter.countLines();
+                sourceModel->setLinesQuantity( indexSource.row(), lines );
+//                qDebug() << "row =" << indexSource.row() << ":" << sourceModel->filePath(indexSource)
+//                         << ", lines =" << sourceModel->getLinesQuantity(indexSource.row());
             }
             catch(std::exception &ex) {
                 QMessageBox::warning( this, tr("Error show file lines"), tr(ex.what()) );
             }
+            emit sigUpdateFileInfo(sourceModel->size(indexSource), lines);
         }
     }
 
 //    QMessageBox::information(this, "Debug", "Stop");
 
-    qDebug() << "   deselected items:";
+//    qDebug() << "   deselected items:";
     indexes = deselected.indexes();
     foreach (index, indexes) {
         if (index.column() == FileSystemCustomModel::rhh_Name) {
@@ -239,9 +245,20 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
                 continue;
 
             indexSource = proxyModel->mapToSource(index);
-            if ( !sourceModel->canCalcLines(indexSource) )
+            // checking for deselecting only files, that was selected in past
+            if ( !sourceModel->canCalcLines(indexSource) ) // check can whether count lines of this file
                 continue;
 
+            /*
+             * NOTE: update file info.
+             * Must placed before clearing the lines quantity value of the deselected file
+             */
+            emit sigUpdateFileInfo( sourceModel->size( indexSource ) * (-1),
+                                    sourceModel->data( sourceModel->index(indexSource.row(),
+                                                                          FileSystemCustomModel::rhh_Lines,
+                                                                          indexSource.parent()),
+                                                       Qt::DisplayRole).toLongLong() * (-1) );
+            // clearing the lines quantity value of the deselected file
             try {
                 sourceModel->setLinesQuantity( indexSource.row(), FileSystemCustomModel::empty_value );
             }
@@ -250,7 +267,7 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
             }
         }
     }
-    qDebug() << "***** selection END *****";
+//    qDebug() << "***** selection END *****";
 }
 
 

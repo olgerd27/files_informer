@@ -3,7 +3,7 @@
 
 #include <QFileSystemModel>
 #include <QVector>
-#include "lines_counter.h"
+#include "common_defines.h"
 
 /*
  * Custom source model methods
@@ -42,8 +42,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     int columnCount(const QModelIndex &parent) const;
 
-    void setLinesQuantity(int index, t_linesCount value);
-    t_linesCount getLinesQuantity(int index) const;
+    void setLinesQuantity(int index, t_linesQnty value);
+    t_linesQnty getLinesQuantity(int index) const;
 
     void resizeLinesQuantity(int size);
     bool canCalcLines(const QModelIndex &indexSource) const;
@@ -59,7 +59,7 @@ private:
         ihh_Empty,
     };
 
-    QVector<t_linesCount> m_linesQnties;
+    QVector<t_linesQnty> m_linesQnts;
 };
 
 #endif // FILE_SYSTEM_CUSTOM_MODEL_H

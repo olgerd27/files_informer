@@ -155,7 +155,20 @@
        </item>
       </layout>
      </widget>
-     <widget class="QListView" name="m_belowListSummary"/>
+     <widget class="QListView" name="m_bottomListSummary">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>100</height>
+       </size>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>

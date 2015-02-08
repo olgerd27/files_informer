@@ -17,6 +17,7 @@ SOURCES += \
 #    q_standard_item_model.cpp \
 #    q_abstract_item_view.cpp
 #    q_table_view.cpp
+    file_info_list_model.cpp
 
 contains(DEFINES, TEST_MODEL) {
     build_pass:!message(Perform the model testing)
@@ -27,7 +28,10 @@ HEADERS += \
     main_window.h \
     dir_tree.h \
     file_system_custom_model.h \
-    lines_counter.h
+    lines_counter.h \
+    file_info_list_model.h \
+    common_defines.h \
+    files_info_data_impl.h
 
 FORMS += \
     main_window.ui
