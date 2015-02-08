@@ -41,7 +41,6 @@ private slots:
     void slotActivatedOnlyDirs(const QModelIndex &index);
     void slotDirectoryWasLoaded(const QString &dir);
     void slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected);
-    void slotGetFileInfo(const QModelIndex &index);
     void slotAboutApp();
 };
 

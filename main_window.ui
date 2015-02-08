@@ -121,26 +121,6 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_cmdShowSummInfo">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>&amp;Show  summary info</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="m_cmdAbout">
            <property name="text">
             <string>&amp;About</string>
@@ -188,7 +168,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>m_cmdShowSummInfo</tabstop>
   <tabstop>m_cmdAbout</tabstop>
   <tabstop>m_cmdAboutQt</tabstop>
   <tabstop>m_cmdExit</tabstop>
