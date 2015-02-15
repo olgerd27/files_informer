@@ -28,7 +28,8 @@ QVariant FileInfoListModel::data(const QModelIndex &index, int role) const
             data = QString("Summary lines: %1").arg( m_dataImpl->filesLines() );
             break;
         case rowFilesDensity:
-            data = QString("Content density: %1 %").arg( m_dataImpl->filesDensity() );
+            t_density value = m_dataImpl->filesDensity();
+            data = QString("Content density: %1 %").arg( qRound(value * 10) / 10.0 );
             break;
         }
     }
