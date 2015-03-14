@@ -207,7 +207,7 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
 
 //    qDebug() << "   selected items:";
     t_linesQnty lines = 0;
-    LinesCounter linesCounter;
+    LinesCounter linesCounter(countLines_STL);
     indexes = selected.indexes();
     foreach (index, indexes) {
         if (index.column() == FileSystemCustomModel::rhh_Name) {

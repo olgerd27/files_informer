@@ -6,7 +6,6 @@
 class FilesInfoDataImpl
 {
 public:
-
     FilesInfoDataImpl()
         : m_files(0)
         , m_size(0)
