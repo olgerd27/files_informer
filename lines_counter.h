@@ -5,27 +5,25 @@
 #include <tr1/functional>
 #include "common_defines.h"
 
-typedef std::string T_strFileName;
-
-t_linesQnty countLines_STL(T_strFileName &filename);
-t_linesQnty countLines_Qt(T_strFileName &filename);
+t_linesQnty countLines_STL(std::string &filename);
+t_linesQnty countLines_Qt(std::string &filename);
 
 class LinesCounter
 {
 public:
-    typedef std::tr1::function<t_linesQnty (T_strFileName &)> T_funcLinesCount;
+    typedef std::tr1::function<t_linesQnty (std::string &)> T_funcLinesCount;
 
     LinesCounter(T_funcLinesCount func);
     ~LinesCounter();
 
-    void setFileName(const T_strFileName &fileName);
-    T_strFileName fileName() const;
+    void setFileName(const std::string &fileName);
+    std::string fileName() const;
 
     void setFuncLinesCount(T_funcLinesCount func);
     t_linesQnty countLines();
 
 private:
-    T_strFileName m_filePathName;
+    std::string m_filePathName;
     t_linesQnty m_linesCount;
     T_funcLinesCount m_funcCountLines;
 };

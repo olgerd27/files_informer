@@ -1,26 +1,34 @@
 #include <fstream>
 #include <stdexcept>
+
+#include <QFile>
 #include <QDebug>
+
 #include "lines_counter.h"
 
 /*
  * Strategy lines counter functions
  */
-t_linesQnty countLines_STL(T_strFileName &filename)
+t_linesQnty countLines_STL(std::string &filename)
 {
     t_linesQnty lines = 0;
     std::ifstream in( filename.c_str() );
     if (!in.is_open())
-        throw std::runtime_error( std::string("countLines_STL()\nCannot open file: ") + filename.c_str() );
+        throw std::runtime_error( std::string("countLines_STL()\nCannot open file: ") + filename );
     std::string str;
     while (std::getline(in, str)) { ++lines; }
     in.close();
     return lines;
 }
 
-t_linesQnty countLines_Qt(T_strFileName &filename)
+t_linesQnty countLines_Qt(std::string &filename)
 {
     t_linesQnty lines = 0;
+    QFile file(QString::fromStdString(filename));
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        throw std::runtime_error( std::string("countLines_Qt()\nCannot open file: ") + filename );
+    while (!file.atEnd()) { file.readLine(); ++lines; }
+    file.close();
     return lines;
 }
 
@@ -37,14 +45,14 @@ LinesCounter::~LinesCounter()
 {
 }
 
-void LinesCounter::setFileName(const T_strFileName &fileName)
+void LinesCounter::setFileName(const std::string &fileName)
 {
     if (fileName.empty())
         throw std::runtime_error( std::string("LinesCounter::setFileName()\nFile name is empty") );
     m_filePathName = fileName;
 }
 
-T_strFileName LinesCounter::fileName() const
+std::string LinesCounter::fileName() const
 {
     return m_filePathName;
 }
