@@ -12,12 +12,12 @@ SOURCES += \
     dir_tree.cpp \
     file_system_custom_model.cpp \
     lines_counter.cpp \
+    file_info_list_model.cpp \
 #    q_sort_filter_proxy_model.cpp \
 #    q_file_system_model.cpp \
 #    q_standard_item_model.cpp \
 #    q_abstract_item_view.cpp
 #    q_table_view.cpp
-    file_info_list_model.cpp
 
 contains(DEFINES, TEST_MODEL) {
     build_pass:!message(Perform the model testing)
@@ -34,7 +34,8 @@ HEADERS += \
     files_info_data_impl.h
 
 FORMS += \
-    main_window.ui
+    main_window.ui \
+#    test_form.ui
 
 RESOURCES += \
     images.qrc
