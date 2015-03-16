@@ -7,8 +7,10 @@ class FileSystemCustomModel;
 class LeftViewProxyModel;
 class RightViewProxyModel;
 class FileInfoListModel;
+class LinesCounter;
 class QModelIndex;
 class QItemSelection;
+class QButtonGroup;
 
 namespace Ui {
     class MainWindow;
@@ -23,6 +25,11 @@ public:
     ~MainWindow();
 
 private:
+    enum countFunctions {
+        counter_STL,
+        counter_Qt
+    };
+
     void setModels();
     void setWidgets();
     void setViews();
@@ -30,6 +37,7 @@ private:
     void setRightView();
     void setBottomView();
     void setButtons();
+    void setRadioButtons();
 
     bool isDir(const QModelIndex &indexProxy) const;
     void resetRightView(const QModelIndex &index);
@@ -39,6 +47,8 @@ private:
     LeftViewProxyModel *m_dirsModel;
     RightViewProxyModel *m_dirsContentsModel;
     FileInfoListModel *m_infoModel;
+    LinesCounter *m_linesCounter;
+    QButtonGroup *m_radioGroup;
 
 private slots:
     void slotSetRightViewRootIndex(const QModelIndex &indexTree);
@@ -46,6 +56,7 @@ private slots:
     void slotActivatedOnlyDirs(const QModelIndex &index);
     void slotDirectoryWasLoaded(const QString &dir);
     void slotUpdateSelection(const QItemSelection &selected, const QItemSelection &deselected);
+    void slotSwitchCounter(int id);
     void slotAboutApp();
 
 signals:

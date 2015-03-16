@@ -5,8 +5,8 @@
 #include <tr1/functional>
 #include "common_defines.h"
 
-t_linesQnty countLines_STL(std::string &filename);
-t_linesQnty countLines_Qt(std::string &filename);
+t_linesQnty fCountLines_STL(std::string &filename);
+t_linesQnty fCountLines_Qt(std::string &filename);
 
 class LinesCounter
 {

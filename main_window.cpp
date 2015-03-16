@@ -51,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     setModels();
     setWidgets();
     setWindowIcon(QIcon(":/images/window_icon.png"));
+    m_linesCounter = new LinesCounter(fCountLines_STL);
 }
 
 MainWindow::~MainWindow()
@@ -141,8 +142,17 @@ void MainWindow::setBottomView()
 
 void MainWindow::setButtons()
 {
+    setRadioButtons();
     connect(ui->m_cmdAbout, SIGNAL(clicked()), SLOT(slotAboutApp()));
     connect(ui->m_cmdAboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
+}
+
+void MainWindow::setRadioButtons()
+{
+    m_radioGroup = new QButtonGroup;
+    m_radioGroup->addButton(ui->m_radioSTLCounter, counter_STL);
+    m_radioGroup->addButton(ui->m_radioQtCounter, counter_Qt);
+    connect(m_radioGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotSwitchCounter(int)));
 }
 
 bool MainWindow::isDir(const QModelIndex &indexProxy) const
@@ -207,7 +217,6 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
 
 //    qDebug() << "   selected items:";
     t_linesQnty lines = 0;
-    LinesCounter linesCounter(countLines_Qt);
     indexes = selected.indexes();
     foreach (index, indexes) {
         if (index.column() == FileSystemCustomModel::rhh_Name) {
@@ -221,8 +230,8 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
 
             // set the lines quantity value of the selected file
             try {
-                linesCounter.setFileName( sourceModel->filePath(indexSource).toStdString() );
-                lines = linesCounter.countLines();
+                m_linesCounter->setFileName( sourceModel->filePath(indexSource).toStdString() );
+                lines = m_linesCounter->countLines();
                 sourceModel->setLinesQuantity( indexSource.row(), lines );
 //                qDebug() << "row =" << indexSource.row() << ":" << sourceModel->filePath(indexSource)
 //                         << ", lines =" << sourceModel->getLinesQuantity(indexSource.row());
@@ -270,6 +279,25 @@ void MainWindow::slotUpdateSelection(const QItemSelection &selected, const QItem
 //    qDebug() << "***** selection END *****";
 }
 
+void MainWindow::slotSwitchCounter(int id)
+{
+    /*
+     * Switch between count lines function in a strategy LinesCounter class
+     */
+    LinesCounter::T_funcLinesCount func;
+    switch (id) {
+    case counter_STL:
+        func = fCountLines_STL;
+        break;
+    case counter_Qt:
+        func = fCountLines_Qt;
+        break;
+    default:
+        func = fCountLines_STL;
+        break;
+    }
+    m_linesCounter->setFuncLinesCount(func);
+}
 
 void MainWindow::slotAboutApp()
 {
