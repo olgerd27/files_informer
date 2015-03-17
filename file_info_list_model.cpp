@@ -11,7 +11,7 @@ FileInfoListModel::~FileInfoListModel()
 {
     delete m_dataImpl;
 }
-
+#include <QDebug>
 QVariant FileInfoListModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) return QVariant();
@@ -29,7 +29,7 @@ QVariant FileInfoListModel::data(const QModelIndex &index, int role) const
             break;
         case rowFilesDensity:
             t_density value = m_dataImpl->filesDensity();
-            data = QString("Content density: %1 %").arg( qRound(value * 10) / 10.0 );
+            data = QString("Content density: %1 characters/line").arg( qRound(value * 10) / 10.0 );
             break;
         }
     }
@@ -64,7 +64,7 @@ t_density FileInfoListModel::filesDensity() const
 
 t_density FileInfoListModel::calcDensity(t_filesSize size, t_linesQnty lines) const
 {
-    return lines * 1.0 / size * 100;
+    return size * 1.0 / lines;
 }
 
 /*
@@ -77,7 +77,7 @@ void FileInfoListModel::slotChangeFileInfo(long size, long lines)
     m_dataImpl->setFilesSize( m_dataImpl->filesSize() + size );
     m_dataImpl->setFilesLines( m_dataImpl->filesLines() + lines );
     m_dataImpl->setFilesDensity( calcDensity( m_dataImpl->filesSize(), m_dataImpl->filesLines() ) );
-    emit dataChanged( index(0), index(3) );
+    emit dataChanged( this->index(0), this->index(3) );
 }
 
 void FileInfoListModel::slotClearFileInfo()
@@ -86,5 +86,5 @@ void FileInfoListModel::slotClearFileInfo()
     m_dataImpl->setFilesSize(0);
     m_dataImpl->setFilesLines(0);
     m_dataImpl->setFilesDensity(0);
-    emit dataChanged( index(0), index(3) );
+    emit dataChanged( this->index(0), this->index(3) );
 }
