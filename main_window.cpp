@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     setModels();
     setWidgets();
     setWindowIcon(QIcon(":/images/window_icon.png"));
-    m_linesCounter = new LinesCounter(fCountLines_STL);
+    m_linesCounter = new LinesCounter(f_countLines_STL);
 }
 
 MainWindow::~MainWindow()
@@ -284,16 +284,13 @@ void MainWindow::slotSwitchCounter(int id)
     /*
      * Switch between count lines function in a strategy LinesCounter class
      */
-    LinesCounter::T_funcLinesCount func;
+    LinesCounter::T_funcLinesCount func = f_countLines_STL;
     switch (id) {
     case counter_STL:
-        func = fCountLines_STL;
+        func = f_countLines_STL;
         break;
     case counter_Qt:
-        func = fCountLines_Qt;
-        break;
-    default:
-        func = fCountLines_STL;
+        func = f_countLines_Qt;
         break;
     }
     m_linesCounter->setFuncLinesCount(func);

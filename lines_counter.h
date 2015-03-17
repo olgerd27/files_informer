@@ -2,11 +2,16 @@
 #define LINES_COUNTER_H
 
 #include <string>
-#include <tr1/functional>
+#if defined Q_CC_MSVC // if compiler is MS Visual C++
+    #include <functional>
+#else
+    #include <tr1/functional>
+#endif
+
 #include "common_defines.h"
 
-t_linesQnty fCountLines_STL(std::string &filename);
-t_linesQnty fCountLines_Qt(std::string &filename);
+t_linesQnty f_countLines_STL(std::string &filename);
+t_linesQnty f_countLines_Qt(std::string &filename);
 
 class LinesCounter
 {

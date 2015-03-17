@@ -9,24 +9,24 @@
 /*
  * Strategy lines counter functions
  */
-t_linesQnty fCountLines_STL(std::string &filename)
+t_linesQnty f_countLines_STL(std::string &filename)
 {
     t_linesQnty lines = 0;
     std::ifstream in( filename.c_str() );
     if (!in.is_open())
-        throw std::runtime_error( std::string("fCountLines_STL()\nCannot open file: ") + filename );
+        throw std::runtime_error( std::string("f_countLines_STL()\nCannot open file: ") + filename );
     std::string str;
     while (std::getline(in, str)) { ++lines; }
     in.close();
     return lines;
 }
 
-t_linesQnty fCountLines_Qt(std::string &filename)
+t_linesQnty f_countLines_Qt(std::string &filename)
 {
     t_linesQnty lines = 0;
     QFile file(QString::fromStdString(filename));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        throw std::runtime_error( std::string("fCountLines_Qt()\nCannot open file: ") + filename );
+        throw std::runtime_error( std::string("f_countLines_Qt()\nCannot open file: ") + filename );
     while (!file.atEnd()) { file.readLine(); ++lines; }
     file.close();
     return lines;
