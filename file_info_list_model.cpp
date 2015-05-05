@@ -11,7 +11,7 @@ FileInfoListModel::~FileInfoListModel()
 {
     delete m_dataImpl;
 }
-#include <QDebug>
+
 QVariant FileInfoListModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) return QVariant();
@@ -22,7 +22,7 @@ QVariant FileInfoListModel::data(const QModelIndex &index, int role) const
             data = QString("Files quantity: %1").arg( m_dataImpl->filesQnty() );
             break;
         case rowFilesSize:
-            data = QString("Summary size: %1 bytes").arg( m_dataImpl->filesSize() );
+            data = QString("Summary size: ") + bytesToSuitUnits( m_dataImpl->filesSize() );
             break;
         case rowFilesLines:
             data = QString("Summary lines: %1").arg( m_dataImpl->filesLines() );
@@ -40,7 +40,6 @@ int FileInfoListModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return 4;
 }
-
 
 t_filesQnty FileInfoListModel::filesQnty() const
 {
@@ -60,6 +59,26 @@ t_linesQnty FileInfoListModel::filesLines() const
 t_density FileInfoListModel::filesDensity() const
 {
     return m_dataImpl->filesDensity();
+}
+
+QString FileInfoListModel::bytesToSuitUnits(t_filesSize size) const
+{
+    if (size == 0) return "0 B";
+    const char *units[] = { "TB", "GB", "MB", "KB", "B" };
+    const int SIZE_units = sizeof(units) / sizeof(units[0]);
+    const int kConv = 1024;
+
+    t_filesSize conv = 1L;
+    for (int i = 0; i < SIZE_units - 1; ++i) conv *= kConv;
+    t_filesSize size_currUnit = size;
+    QString res;
+    for (int i = 0; i < SIZE_units; ++i, conv /= kConv) {
+        if ((size_currUnit = size / conv) > 0) {
+            res += QString("%1 %2  ").arg(size_currUnit).arg(units[i]);
+            size %= conv;
+        }
+    }
+    return res;
 }
 
 t_density FileInfoListModel::calcDensity(t_filesSize size, t_linesQnty lines) const

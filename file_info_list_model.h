@@ -34,6 +34,7 @@ private:
         rowFilesDensity
     };
 
+    QString bytesToSuitUnits(t_filesSize size) const;
     t_density calcDensity(t_filesSize size, t_linesQnty lines) const;
 
     FilesInfoDataImpl *m_dataImpl;
